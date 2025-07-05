@@ -11,19 +11,17 @@ class THEFALL_API ATFCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+	// 캐릭터의 스탯(체력, 스태미나, 허기, 갈증 등)을 관리하는 컴포넌트
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class UStatlineComponent* Statline;
 public:
-	// Sets default values for this character's properties
 	ATFCharacter();
 
-protected:
-	// Called when the game starts or when spawned
+protected:	
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
 };

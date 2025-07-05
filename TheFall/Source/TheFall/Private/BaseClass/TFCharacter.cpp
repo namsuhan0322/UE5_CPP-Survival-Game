@@ -2,33 +2,30 @@
 
 
 #include "BaseClass/TFCharacter.h"
+#include "Component/StatlineComponent.h"					// 스탯 컴포넌트를 사용하기 위해 필요함
 
-// Sets default values
 ATFCharacter::ATFCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	// StatlineComponent 생성 및 초기화 (캐릭터에 부착)
+	Statline = CreateDefaultSubobject<UStatlineComponent>(TEXT("Statline"));
 }
 
-// Called when the game starts or when spawned
 void ATFCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
-// Called every frame
 void ATFCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
-// Called to bind functionality to input
 void ATFCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
-

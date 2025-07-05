@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "TheFallGameMode.h"
-#include "TheFallCharacter.h"
+#include "BaseClass/TFPlayerCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 
 ATheFallGameMode::ATheFallGameMode()
