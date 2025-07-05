@@ -13,7 +13,7 @@ class UInputAction;
 struct FInputActionValue;
 
 /**
- * 
+ *
  */
 UCLASS(config = Game)
 class THEFALL_API ATFPlayerCharacter : public ATFCharacter
@@ -22,12 +22,13 @@ class THEFALL_API ATFPlayerCharacter : public ATFCharacter
 
 private:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
 
+#pragma region Input
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
 
@@ -39,6 +40,10 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* SprintAction;
+
+#pragma endregion
 
 protected:
 
@@ -46,10 +51,15 @@ protected:
 
 	void Look(const FInputActionValue& Value);
 
+	void PlayerJump();
+
+	void SprintOn();
+	void SprintOff();
+
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	virtual void BeginPlay();
-	
+
 public:
 	ATFPlayerCharacter();
 

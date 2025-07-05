@@ -39,6 +39,24 @@ void ATFPlayerCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
+void ATFPlayerCharacter::PlayerJump()
+{
+	if (ATFCharacter::CanJump())
+	{
+		ATFCharacter::HasJumped();
+	}
+}
+
+void ATFPlayerCharacter::SprintOn()
+{
+	SetSprinting(true);
+}
+
+void ATFPlayerCharacter::SprintOff()
+{
+	SetSprinting(false);
+}
+
 void ATFPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
@@ -49,16 +67,17 @@ void ATFPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		}
 	}
 
-	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) 
+	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ATFPlayerCharacter::PlayerJump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ATFPlayerCharacter::Move);
-
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ATFPlayerCharacter::Look);
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &ATFPlayerCharacter::SprintOn);
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &ATFPlayerCharacter::SprintOff);
 	}
 }
+
 
 void ATFPlayerCharacter::BeginPlay()
 {
@@ -73,7 +92,7 @@ ATFPlayerCharacter::ATFPlayerCharacter()
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
-	GetCharacterMovement()->bOrientRotationToMovement = true;	
+	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f);
 	GetCharacterMovement()->JumpZVelocity = 700.f;
 	GetCharacterMovement()->AirControl = 0.35f;

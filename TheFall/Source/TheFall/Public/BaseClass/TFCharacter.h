@@ -17,10 +17,16 @@ class THEFALL_API ATFCharacter : public ACharacter
 public:
 	ATFCharacter();
 
-protected:	
+protected:
 	virtual void BeginPlay() override;
 
-public:	
+	bool CanJump() const;
+	void HasJumped();
+
+	bool CanSprint() const;
+	void SetSprinting(const bool& IsSprinting);
+
+public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

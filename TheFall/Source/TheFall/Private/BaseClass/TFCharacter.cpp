@@ -10,12 +10,34 @@ ATFCharacter::ATFCharacter()
 
 	// StatlineComponent 생성 및 초기화 (캐릭터에 부착)
 	Statline = CreateDefaultSubobject<UStatlineComponent>(TEXT("Statline"));
+	Statline->SetMovementCompReference(GetCharacterMovement());
 }
 
 void ATFCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+}
+
+bool ATFCharacter::CanJump() const
+{
+	return Statline->CanJump();
+}
+
+void ATFCharacter::HasJumped()
+{
+	Statline->HasJumped();
+	ACharacter::Jump();
+}
+
+bool ATFCharacter::CanSprint() const
+{
+	return Statline->CanSprint();
+}
+
+void ATFCharacter::SetSprinting(const bool& IsSprinting)
+{
+	Statline->SetSprinting(IsSprinting);
 }
 
 void ATFCharacter::Tick(float DeltaTime)

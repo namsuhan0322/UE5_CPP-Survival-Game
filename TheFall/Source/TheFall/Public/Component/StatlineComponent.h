@@ -69,15 +69,23 @@ public:
 	{
 		PerSecondTick = NewTick;
 	}
+
+	float GetCurrent() const
+	{
+		return Current;
+	}
 };
 
 /// 캐릭터의 스탯들을 관리하는 컴포넌트 클래스
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class THEFALL_API UStatlineComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 private:
+
+	class UCharacterMovementComponent* OwningCharMovementComp;
+
 	// 체력 스탯
 	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	FCoreStat Health;
@@ -91,20 +99,47 @@ private:
 	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	FCoreStat Thirst = FCoreStat(100, 100, -0.25);
 
+	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	bool bIsSprinting = false;
+	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float SprintCostMulitiplier = 2;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float WalkSpeed = 125;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float SprintSpeed = 450;
+
+	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float JumpCost = 10;
+
 	// 모든 스탯을 프레임마다 갱신하는 내부 함수
 	void TickStats(const float& DeltaTime);
-
-public:	
-	// 생성자
-	UStatlineComponent();
+	void TickStamina(const float& DeltaTime);
+	bool IsValidSprinting();
 
 protected:
 	virtual void BeginPlay() override;
 
-public:	
+public:
+
+	// 생성자
+	UStatlineComponent();
+
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	UFUNCTION(BlueprintCallable)
+	void SetMovementCompReference(UCharacterMovementComponent* Comp);
 
 	// 외부에서 특정 스탯의 퍼센트 값을 얻는 함수 (UI 바 등에 사용 가능)
 	UFUNCTION(BlueprintCallable)
 	float GetStatPercentile(const ECoreStat Stat) const;
+
+	UFUNCTION(BlueprintCallable)
+	bool CanSprint() const;
+	UFUNCTION(BlueprintCallable)
+	void SetSprinting(const bool& IsSprinting);
+	UFUNCTION(BlueprintCallable)
+	bool CanJump();
+	UFUNCTION(BlueprintCallable)
+	void HasJumped();
 };
