@@ -6,6 +6,11 @@
 #include "GameFramework/Character.h"
 #include "TFCharacter.generated.h"
 
+/**
+ * ATFCharacter
+ * 기본 캐릭터 클래스. 공용 캐릭터 기능(스탯 관리 등)을 처리.
+ * 플레이어와 AI 캐릭터 모두 이 클래스를 기반으로 확장 가능.
+ */
 UCLASS()
 class THEFALL_API ATFCharacter : public ACharacter
 {
@@ -20,11 +25,16 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	bool CanJump() const;
-	void HasJumped();
+	// 점프 관련
+	bool CanJump() const;								// 점프 가능한지 여부 확인
+	void HasJumped();									// 점프 시 호출 (스태미나 소모 포함)
 
-	bool CanSprint() const;
-	void SetSprinting(const bool& IsSprinting);
+	// 달리기 관련
+	bool CanSprint() const;								// 달리기 가능 여부 확인
+	void SetSprinting(const bool& IsSprinting);			// 달리기 상태 설정
+
+	// 웅크리기 관련	
+	void SetSneaking(const bool& IsSneaking);			// 웅크리기 상태 설정
 
 public:
 	virtual void Tick(float DeltaTime) override;

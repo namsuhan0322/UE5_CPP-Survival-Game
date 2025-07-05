@@ -26,11 +26,13 @@ private:
 	// 현재 수치
 	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float Current = 100;
+
 	// 최대 수치
 	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float Max = 100;
+
 	// 초당 변화량
-	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float PerSecondTick = 1;
 
 public:
@@ -86,36 +88,46 @@ private:
 
 	class UCharacterMovementComponent* OwningCharMovementComp;
 
-	// 체력 스탯
+	// 스탯 데이터들
 	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	FCoreStat Health;
-	// 스태미나 스탯
 	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	FCoreStat Stamina;
-	// 허기 스탯 (초당 감소)
-	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	FCoreStat Hunger = FCoreStat(100, 100, -0.125);
-	// 갈증 스탯 (초당 더 빠르게 감소)
-	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	FCoreStat Thirst = FCoreStat(100, 100, -0.25);
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	FCoreStat Hunger = FCoreStat(100, 100, -2.125);	// 기본적으로 서서히 줄어듦
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	FCoreStat Thirst = FCoreStat(100, 100, -2.25);	// 갈증은 허기보다 더 빠르게 줄어듦
 
+	// 현재 상태 플래그 및 수치
 	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bIsSprinting = false;
 	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	float SprintCostMulitiplier = 2;
-
+	bool bIsSneaking = false;
+	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float SprintCostMulitiplier = 2;				// 달릴 때 스태미나 소모 배율
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float WalkSpeed = 125;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float SprintSpeed = 450;
-
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float SneakSpeed = 75;
 	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	float JumpCost = 10;
+	float JumpCost = 10;							// 점프 시 스태미나 소모량
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float SecondsForStaminaExhuastion = 5;			// 스태미나 0 유지 시간 기준
+	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float CurrentStaminaExhuastion = 0;				// 현재 탈진 지속 시간
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float StarvingHealthDamagePerSecond = 1;		// 현재 탈진 지속 시간
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	float DehydrationHealthDamagePerSecond = 1;		// 갈증 0일 때 체력 감소량
 
-	// 모든 스탯을 프레임마다 갱신하는 내부 함수
-	void TickStats(const float& DeltaTime);
-	void TickStamina(const float& DeltaTime);
-	bool IsValidSprinting();
+	// 내부 업데이트 함수들
+	void TickStats(const float& DeltaTime);			// 전체 스탯 틱 갱신
+	void TickStamina(const float& DeltaTime);		// 스태미나 전용 처리
+	void TickHunger(const float& DeltaTime);		// 허기 처리
+	void TickThirst(const float& DeltaTime);		// 갈증 처리
+	bool IsValidSprinting();						// 스프린트 유효성 확인
 
 protected:
 	virtual void BeginPlay() override;
@@ -127,19 +139,26 @@ public:
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	// 외부에서 캐릭터 이동 컴포넌트를 참조 연결할 때 사용
 	UFUNCTION(BlueprintCallable)
 	void SetMovementCompReference(UCharacterMovementComponent* Comp);
 
-	// 외부에서 특정 스탯의 퍼센트 값을 얻는 함수 (UI 바 등에 사용 가능)
+	// UI 등에서 퍼센트 스탯 조회
 	UFUNCTION(BlueprintCallable)
 	float GetStatPercentile(const ECoreStat Stat) const;
-
+	// 달릴 수 있는지 여부
 	UFUNCTION(BlueprintCallable)
 	bool CanSprint() const;
+	// 달리기 상태 설정
 	UFUNCTION(BlueprintCallable)
 	void SetSprinting(const bool& IsSprinting);
+	// 웅크리기 상태 설정
+	UFUNCTION(BlueprintCallable)
+	void SetSneaking(const bool& IsSneaking);
+	// 점프 가능 여부
 	UFUNCTION(BlueprintCallable)
 	bool CanJump();
+	// 점프 실행 시 호출 (스태미나 차감 등)
 	UFUNCTION(BlueprintCallable)
 	void HasJumped();
 };
