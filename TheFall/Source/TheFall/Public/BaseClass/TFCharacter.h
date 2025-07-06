@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interface/SaveActorInterface.h"
 #include "TFCharacter.generated.h"
 
 /**
@@ -12,13 +13,19 @@
  * 플레이어와 AI 캐릭터 모두 이 클래스를 기반으로 확장 가능.
  */
 UCLASS()
-class THEFALL_API ATFCharacter : public ACharacter
+class THEFALL_API ATFCharacter : public ACharacter, public ISaveActorInterface
 {
 	GENERATED_BODY()
 
+private:
 	// 캐릭터의 스탯(체력, 스태미나, 허기, 갈증 등)을 관리하는 컴포넌트
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, SaveGame, meta = (AllowPrivateAccess = "true"))
 	class UStatlineComponent* Statline;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, SaveGame, meta = (AllowPrivateAccess = "true"))
+	FGuid SaveActorID;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, SaveGame, meta = (AllowPrivateAccess = "true"))
+	bool WasSpawned = false;
+
 public:
 	ATFCharacter();
 
@@ -40,4 +47,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	FGuid GetActorSaveID_Implementation();
+	FSaveActorData GetSaveData_Implementation();
 };

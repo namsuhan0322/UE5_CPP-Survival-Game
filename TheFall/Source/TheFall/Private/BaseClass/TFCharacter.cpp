@@ -12,12 +12,18 @@ ATFCharacter::ATFCharacter()
 	Statline = CreateDefaultSubobject<UStatlineComponent>(TEXT("Statline"));
 	// 캐릭터의 이동 컴포넌트를 Statline에 연결
 	Statline->SetMovementCompReference(GetCharacterMovement());
+
+	SaveActorID = FGuid::NewGuid();
 }
 
 void ATFCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (!SaveActorID.IsValid())
+	{
+		SaveActorID = FGuid::NewGuid();
+	}
 }
 
 /// 점프 가능한 상태인지 확인
@@ -62,4 +68,20 @@ void ATFCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+FGuid ATFCharacter::GetActorSaveID_Implementation()
+{
+	return SaveActorID;
+}
+
+FSaveActorData ATFCharacter::GetSaveData_Implementation()
+{
+	FSaveActorData Ret;
+
+	Ret.ActorClass = this->GetClass();
+	Ret.ActorTransform = this->GetTransform();
+	Ret.WasSpawned = this->WasSpawned;
+
+	return Ret;
 }

@@ -24,15 +24,15 @@ struct FCoreStat
 
 private:
 	// 현재 수치
-	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, SaveGame, meta = (AllowPrivateAccess = "true"))
 	float Current = 100;
 
 	// 최대 수치
-	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, SaveGame, meta = (AllowPrivateAccess = "true"))
 	float Max = 100;
 
 	// 초당 변화량
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, SaveGame, meta = (AllowPrivateAccess = "true"))
 	float PerSecondTick = 1;
 
 public:
@@ -89,13 +89,13 @@ private:
 	class UCharacterMovementComponent* OwningCharMovementComp;
 
 	// 스탯 데이터들
-	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, SaveGame, meta = (AllowPrivateAccess = "true"))
 	FCoreStat Health;
-	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, SaveGame, meta = (AllowPrivateAccess = "true"))
 	FCoreStat Stamina;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, SaveGame, meta = (AllowPrivateAccess = "true"))
 	FCoreStat Hunger = FCoreStat(100, 100, -2.125);	// 기본적으로 서서히 줄어듦
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, SaveGame, meta = (AllowPrivateAccess = "true"))
 	FCoreStat Thirst = FCoreStat(100, 100, -2.25);	// 갈증은 허기보다 더 빠르게 줄어듦
 
 	// 현재 상태 플래그 및 수치
@@ -146,15 +146,18 @@ public:
 	// UI 등에서 퍼센트 스탯 조회
 	UFUNCTION(BlueprintCallable)
 	float GetStatPercentile(const ECoreStat Stat) const;
+
 	// 달릴 수 있는지 여부
 	UFUNCTION(BlueprintCallable)
 	bool CanSprint() const;
 	// 달리기 상태 설정
 	UFUNCTION(BlueprintCallable)
 	void SetSprinting(const bool& IsSprinting);
+
 	// 웅크리기 상태 설정
 	UFUNCTION(BlueprintCallable)
 	void SetSneaking(const bool& IsSneaking);
+
 	// 점프 가능 여부
 	UFUNCTION(BlueprintCallable)
 	bool CanJump();
