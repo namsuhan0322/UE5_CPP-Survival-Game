@@ -3,6 +3,7 @@
 
 #include "Component/StatlineComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "TFUtils.h"
 
 /// 각각의 스탯을 프레임마다 갱신하는 함수
 void UStatlineComponent::TickStats(const float& DeltaTime)
@@ -157,6 +158,7 @@ void UStatlineComponent::SetSprinting(const bool& IsSprinting)
 	OwningCharMovementComp->MaxWalkSpeed = bIsSprinting ? SprintSpeed : WalkSpeed;
 }
 
+///  웅크리기 상태 설정
 void UStatlineComponent::SetSneaking(const bool& IsSneaking)
 {
 	/// 웅크리기 상태 설정
@@ -184,4 +186,46 @@ bool UStatlineComponent::CanJump()
 void UStatlineComponent::HasJumped()
 {
 	Stamina.Adjust(0 - JumpCost);
+}
+
+FSaveComponentData UStatlineComponent::GetComponentSaveData_Implementation()
+{
+	FSaveComponentData Ret;
+
+	Ret.ComponentClass = this->GetClass();
+	Ret.RawData.Add(Health.GetSaveString());
+	Ret.RawData.Add(Stamina.GetSaveString());
+	Ret.RawData.Add(Hunger.GetSaveString());
+	Ret.RawData.Add(Thirst.GetSaveString());
+	// Any addition raw data adds here, head to be inculded in the GetComponentSaveData_Implementation(Function)
+
+	return Ret;
+}
+
+void UStatlineComponent::SetComponentSaveData_Implementation(FSaveComponentData Data)
+{
+	TArray<FString> Parts;
+	for (int i = 0; i < Data.RawData.Num(); i++)
+	{
+		Parts.Empty();
+		Parts = ChopString(Data.RawData[i], '|');
+		switch (i)
+		{
+		case 0:
+			Health.UpdateFromSaveString(Parts);
+			break;
+		case 1:
+			Stamina.UpdateFromSaveString(Parts);
+			break;
+		case 2:
+			Hunger.UpdateFromSaveString(Parts);
+			break;
+		case 3:
+			Thirst.UpdateFromSaveString(Parts);
+			break;
+		default:
+			// Log Error
+			break;
+		}
+	}
 }
