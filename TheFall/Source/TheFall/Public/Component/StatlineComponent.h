@@ -1,10 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Interface/SaveActorInterface.h"
+#include "Logger.h"
 #include "StatlineComponent.generated.h"
 
 /// 핵심 스탯의 종류를 정의하는 열거형 (블루프린트에서도 사용 가능)
@@ -73,11 +75,13 @@ public:
 		PerSecondTick = NewTick;
 	}
 
+	// 현재 값 반환
 	float GetCurrent() const
 	{
 		return Current;
 	}
 
+	// 저장용 문자열로 변환 ("Current|Max|PerSecondTick" 형태)
 	FString GetSaveString()
 	{
 		FString Ret = FString::SanitizeFloat(Current);
@@ -88,10 +92,13 @@ public:
 		return Ret;
 	}
 
+	// 저장 문자열을 파싱해 스탯 값 업데이트 (Parts는 "|" 기준 분할된 배열)
 	void UpdateFromSaveString(TArray<FString> Parts)
 	{
 		if (Parts.Num() != 3)
 		{
+			// 경고 로그 출력 (저장 데이터가 잘못된 경우)
+			Logger::GetInstance()->AddMessage("FCoreStat::UpdateFromSaveString called with other then 3 parts", ERRORLEVEL::EL_WARNING);
 			return;
 		}
 		Current = FCString::Atof(*Parts[0]);
@@ -107,7 +114,6 @@ class THEFALL_API UStatlineComponent : public UActorComponent, public ISaveActor
 	GENERATED_BODY()
 
 private:
-
 	class UCharacterMovementComponent* OwningCharMovementComp;
 
 	// 스탯 데이터들

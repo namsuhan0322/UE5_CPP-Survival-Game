@@ -103,9 +103,12 @@ void ATFPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	}
 }
 
+/// 시작 시 실행하는 함수
 void ATFPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	//ATFCharacter::BeginPlay();
+	SaveActorID.Invalidate();
 }
 
 /// 생성자: 컴포넌트 초기화 및 설정

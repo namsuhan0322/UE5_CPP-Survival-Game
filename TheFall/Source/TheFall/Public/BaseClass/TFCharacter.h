@@ -21,33 +21,42 @@ private:
 	// 캐릭터의 스탯(체력, 스태미나, 허기, 갈증 등)을 관리하는 컴포넌트
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, SaveGame, meta = (AllowPrivateAccess = "true"))
 	class UStatlineComponent* Statline;
+
+protected:
+	// 이 캐릭터를 고유하게 식별하기 위한 저장용 ID
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, SaveGame, meta = (AllowPrivateAccess = "true"))
 	FGuid SaveActorID;
+
+	// 이 캐릭터가 저장된 상태에서 스폰된 것인지 여부
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, SaveGame, meta = (AllowPrivateAccess = "true"))
 	bool WasSpawned = false;
 
-public:
-	ATFCharacter();
-
-protected:
+	// 게임 시작 시 초기화 처리
 	virtual void BeginPlay() override;
 
-	// 점프 관련
-	bool CanJump() const;								// 점프 가능한지 여부 확인
-	void HasJumped();									// 점프 시 호출 (스태미나 소모 포함)
+	// 점프 관련 함수들
+	bool CanJump() const;								// 점프 가능한 상태인지 확인
+	void HasJumped();									// 실제 점프 시 호출됨 (스태미나 소모 등 처리)
 
-	// 달리기 관련
-	bool CanSprint() const;								// 달리기 가능 여부 확인
+	// 달리기 관련 함수들
+	bool CanSprint() const;			 					// 달릴 수 있는 상태인지 확인
 	void SetSprinting(const bool& IsSprinting);			// 달리기 상태 설정
 
-	// 웅크리기 관련	
+	// 웅크리기 관련 함수
 	void SetSneaking(const bool& IsSneaking);			// 웅크리기 상태 설정
 
 public:
+	// 생성자
+	ATFCharacter();
+
+	// 매 프레임마다 호출되는 함수
 	virtual void Tick(float DeltaTime) override;
 
+	// 입력 바인딩 설정
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	FGuid GetActorSaveID_Implementation();
-	FSaveActorData GetSaveData_Implementation();
+	// 저장 인터페이스 구현부들
+	FGuid GetActorSaveID_Implementation();						// 이 캐릭터의 저장용 고유 ID 반환
+	FSaveActorData GetSaveData_Implementation();				// 이 캐릭터의 저장 데이터 반환
+	void SetActorGUID_Implementation(const FGuid& NewGuid);		// 저장용 ID 설정
 };

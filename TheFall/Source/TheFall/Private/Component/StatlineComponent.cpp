@@ -4,6 +4,7 @@
 #include "Component/StatlineComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "TFUtils.h"
+#include "Logger.h"
 
 /// 각각의 스탯을 프레임마다 갱신하는 함수
 void UStatlineComponent::TickStats(const float& DeltaTime)
@@ -127,6 +128,7 @@ float UStatlineComponent::GetStatPercentile(const ECoreStat Stat) const
 	case ECoreStat::CS_THIRST:
 		return Thirst.Percentile(); // 갈증 비율 반환
 	default:
+		Logger::GetInstance()->AddMessage("GetStatPercentile called with invalid stat type", ERRORLEVEL::EL_WARNING);
 		break;
 	}
 
