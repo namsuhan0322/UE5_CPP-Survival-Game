@@ -5,12 +5,37 @@
 #include "Engine/LocalPlayer.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/SphereComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/Controller.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Interface/InteractionInterface.h"
+#include "Logger.h"
+
+void ATFPlayerCharacter::TraceForInteraction()
+{
+	FCollisionQueryParams LTParmas = FCollisionQueryParams(FName(TEXT("InteractionTrace")), true, this);
+	LTParmas.bReturnPhysicalMaterial = false;
+	LTParmas.bReturnFaceIndex = false;
+	GetWorld()->DebugDrawTraceTag = TEXT("InteractionTrace");
+	FHitResult LTHit(ForceInit);
+	FVector LTStart = FollowCamera->GetComponentLocation();
+	float SearchLength = (FollowCamera->GetComponentLocation() - CameraBoom->GetComponentLocation()).Length();
+	SearchLength += InteractionTraceLength;
+	FVector LTEnd = (FollowCamera->GetForwardVector() * SearchLength) + LTStart;
+
+	GetWorld()->LineTraceSingleByChannel(LTHit, LTStart, LTEnd, ECC_Visibility, LTParmas);
+
+	if (!LTHit.bBlockingHit || !LTHit.GetActor()->Implements<UInteractionInterface>())
+	{
+		InteractionActor = nullptr;
+		return;
+	}
+	InteractionActor = LTHit.GetActor();
+}
 
 /// 플레이어 이동 처리
 void ATFPlayerCharacter::Move(const FInputActionValue& Value)
@@ -77,6 +102,22 @@ void ATFPlayerCharacter::SneakOff()
 	SetSneaking(false);
 }
 
+void ATFPlayerCharacter::OnInteract()
+{
+	if (InteractionActor == nullptr)
+	{
+		return;
+	}
+	IInteractionInterface* Inter = Cast<IInteractionInterface>(InteractionActor);
+	if (Inter == nullptr)
+	{
+		Logger::GetInstance()->AddMessage("ATFPlayerCharacter::OnInteract - Failed to cast to InteractionInterface", ERRORLEVEL::EL_ERROR);
+		return;
+	}
+	//Inter->Interact_Implementation(this);
+	Inter->Execute_Interact(InteractionActor, this);
+}
+
 /// 입력 바인딩 처리
 void ATFPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -100,6 +141,7 @@ void ATFPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &ATFPlayerCharacter::SprintOff);			// 달리기 해제
 		EnhancedInputComponent->BindAction(SneakAction, ETriggerEvent::Started, this, &ATFPlayerCharacter::SneakOn);				// 웅크리기 시작
 		EnhancedInputComponent->BindAction(SneakAction, ETriggerEvent::Completed, this, &ATFPlayerCharacter::SneakOff);				// 웅크리기 해제
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Completed, this, &ATFPlayerCharacter::OnInteract);		// 상호작용
 	}
 }
 
@@ -142,4 +184,45 @@ ATFPlayerCharacter::ATFPlayerCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);		// 붐 끝에 부착
 	FollowCamera->bUsePawnControlRotation = false;									// 카메라는 붐을 통해 회전
+
+	InteractionTrigger = CreateDefaultSubobject<USphereComponent>(TEXT("Interaction Trigger Volume"));
+	InteractionTrigger->SetupAttachment(RootComponent);
+	InteractionTrigger->OnComponentBeginOverlap.AddDynamic(this, &ATFPlayerCharacter::OnInteractionTriggerOverlapBegin);
+	InteractionTrigger->OnComponentEndOverlap.AddDynamic(this, &ATFPlayerCharacter::OnInteractionTriggerOverlapEnd);
+
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bTickEvenWhenPaused = false;
+}
+
+void ATFPlayerCharacter::Tick(float DeltaTime)
+{
+	if (bEnableRayTrace)
+	{
+		TraceForInteraction();
+	}
+}
+
+void ATFPlayerCharacter::OnInteractionTriggerOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OhterBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (!OtherActor->Implements<UInteractionInterface>())
+	{
+		return;
+	}
+	InteractableActors.Add(OtherActor);
+	bEnableRayTrace = true;
+}
+
+void ATFPlayerCharacter::OnInteractionTriggerOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OhterBodyIndex)
+{
+	if (!OtherActor->Implements<UInteractionInterface>())
+	{
+		return;
+	}
+	InteractableActors.Remove(OtherActor);
+	bEnableRayTrace = InteractableActors.Num() > 0;
+}
+
+void ATFPlayerCharacter::UpdateInteractionText_Implementation()
+{
+	UpdateInteractionText();
 }
