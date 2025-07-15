@@ -83,6 +83,10 @@ public:
 	FSaveActorData GetSaveData();
 	virtual FSaveActorData GetSaveData_Implementation();
 
+	UFUNCTION(BlueprintNativeEvent)
+	void UpdateFromSave();
+	void UpdateFromSave_Implementation();
+
 	/// 액터의 컴포넌트 저장 데이터 반환
 	UFUNCTION(BlueprintNativeEvent)
 	FSaveComponentData GetComponentSaveData();

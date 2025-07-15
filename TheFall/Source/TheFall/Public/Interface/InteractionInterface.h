@@ -21,7 +21,7 @@ class THEFALL_API IInteractionInterface
 	GENERATED_BODY()
 
 public:
- 	UFUNCTION(BlueprintNativeEvent)
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	FText GetInteractionText();
 	FText GetInteractionText_Implementation();
 

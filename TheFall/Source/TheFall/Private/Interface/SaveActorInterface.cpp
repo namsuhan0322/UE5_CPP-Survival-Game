@@ -29,6 +29,11 @@ FSaveActorData ISaveActorInterface::GetSaveData_Implementation()
 	return FSaveActorData();
 }
 
+void ISaveActorInterface::UpdateFromSave_Implementation()
+{
+	UpdateFromSave();
+}
+
 // 액터가 보유한 컴포넌트의 저장 데이터를 반환
 // 기본 구현은 ‘빈’ FSaveComponentData 구조체를 반환합니다.
 FSaveComponentData ISaveActorInterface::GetComponentSaveData_Implementation()

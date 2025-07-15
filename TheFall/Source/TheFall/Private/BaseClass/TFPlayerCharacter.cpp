@@ -20,7 +20,7 @@ void ATFPlayerCharacter::TraceForInteraction()
 	FCollisionQueryParams LTParmas = FCollisionQueryParams(FName(TEXT("InteractionTrace")), true, this);
 	LTParmas.bReturnPhysicalMaterial = false;
 	LTParmas.bReturnFaceIndex = false;
-	GetWorld()->DebugDrawTraceTag = TEXT("InteractionTrace");
+	GetWorld()->DebugDrawTraceTag = DEBUG_SHOW_INTERACTION_TRACE ? TEXT("InteractionTrace") : TEXT("NONE");
 	FHitResult LTHit(ForceInit);
 	FVector LTStart = FollowCamera->GetComponentLocation();
 	float SearchLength = (FollowCamera->GetComponentLocation() - CameraBoom->GetComponentLocation()).Length();
@@ -29,6 +29,7 @@ void ATFPlayerCharacter::TraceForInteraction()
 
 	GetWorld()->LineTraceSingleByChannel(LTHit, LTStart, LTEnd, ECC_Visibility, LTParmas);
 
+	UpdateInteractionText_Implementation();
 	if (!LTHit.bBlockingHit || !LTHit.GetActor()->Implements<UInteractionInterface>())
 	{
 		InteractionActor = nullptr;
@@ -114,7 +115,6 @@ void ATFPlayerCharacter::OnInteract()
 		Logger::GetInstance()->AddMessage("ATFPlayerCharacter::OnInteract - Failed to cast to InteractionInterface", ERRORLEVEL::EL_ERROR);
 		return;
 	}
-	//Inter->Interact_Implementation(this);
 	Inter->Execute_Interact(InteractionActor, this);
 }
 
@@ -187,6 +187,7 @@ ATFPlayerCharacter::ATFPlayerCharacter()
 
 	InteractionTrigger = CreateDefaultSubobject<USphereComponent>(TEXT("Interaction Trigger Volume"));
 	InteractionTrigger->SetupAttachment(RootComponent);
+	InteractionTrigger->SetRelativeScale3D(FVector(10));
 	InteractionTrigger->OnComponentBeginOverlap.AddDynamic(this, &ATFPlayerCharacter::OnInteractionTriggerOverlapBegin);
 	InteractionTrigger->OnComponentEndOverlap.AddDynamic(this, &ATFPlayerCharacter::OnInteractionTriggerOverlapEnd);
 

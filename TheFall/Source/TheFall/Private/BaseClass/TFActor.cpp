@@ -45,6 +45,17 @@ void ATFActor::SetActorGUID_Implementation(const FGuid& NewGuid)
 
 FSaveActorData ATFActor::GetSaveData_Implementation()
 {
-	return FSaveActorData();
+	FSaveActorData Ret;
+	Ret.ActorTransform = this->GetActorTransform();
+	Ret.ActorClass = this->GetClass();
+	Ret.WasSpawned = bWasSpawned;
+	return Ret;
+}
+
+void ATFActor::UpdateFromSave_Implementation()
+{
+	//UpdateFromSave();
+	Execute_UpdateFromSave(this);
+	// None Blueprint logic goes here
 }
 

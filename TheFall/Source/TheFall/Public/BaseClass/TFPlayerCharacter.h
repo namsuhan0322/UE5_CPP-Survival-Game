@@ -66,13 +66,16 @@ private:
 #pragma endregion
 
 	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	bool bEnableRayTrace = false;
+	bool bEnableRayTrace = true;
 	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TArray<AActor*> InteractableActors;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	float InteractionTraceLength = 200;
 	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	AActor* InteractionActor = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = DEBUG, meta = (AllowPrivateAccess = "true"))
+	bool DEBUG_SHOW_INTERACTION_TRACE = false;
 
 	void TraceForInteraction();
 

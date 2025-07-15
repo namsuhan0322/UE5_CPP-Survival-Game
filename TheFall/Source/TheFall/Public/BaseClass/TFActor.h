@@ -12,18 +12,23 @@ class THEFALL_API ATFActor : public AActor, public ISaveActorInterface
 {
 	GENERATED_BODY()
 
-	FGuid SaveID;
+private:	
 
-public:	
-	ATFActor();
 
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FGuid SaveID;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bWasSpawned = false;
+
 	virtual void BeginPlay() override;
 
 public:	
+	ATFActor();
 	virtual void Tick(float DeltaTime) override;
 
 	virtual FGuid GetActorSaveID_Implementation();
 	virtual void SetActorGUID_Implementation(const FGuid& NewGuid);
 	virtual FSaveActorData GetSaveData_Implementation();
+	void UpdateFromSave_Implementation();
 };

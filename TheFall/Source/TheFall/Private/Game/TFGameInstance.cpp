@@ -145,7 +145,7 @@ void UTFGameInstance::LoadGame()
 		FObjectAndNameAsStringProxyArchive Ar(MemReader, true);
 		Ar.ArIsSaveGame = true;
 		Actor->Serialize(Ar);
-
+		Inter->Execute_UpdateFromSave(Actor);
 		// 컴포넌트 복원
 		for (auto ActorComp : Actor->GetComponents())
 		{
