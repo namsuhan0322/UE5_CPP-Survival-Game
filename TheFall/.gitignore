@@ -34,6 +34,10 @@
 *.sdf
 *.abc
 
+# Unreal Engine Assets
+Content/**/*.uasset
+Content/**/*.umap
+
 # Precompiled Assets
 SourceArt/**/*.png
 SourceArt/**/*.tga
