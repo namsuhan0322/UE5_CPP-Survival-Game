@@ -25,13 +25,16 @@ private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* TreeStumpMesh;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	class AActor* LogPickupActor;
+	class TSubclassOf<class ATFPickupActorBase> LogPickupActor;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	int NumberOfLogsToSpawn = 2;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	TArray<FTransform> SpawnActorTransforms;
 
 	ATFTreeBase();
 	void SetHarvestState();
 	void Harvest();
+	void SpawnPickups();
 
 protected:
 

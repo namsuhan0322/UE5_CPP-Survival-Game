@@ -25,10 +25,10 @@ public:
 	FText GetInteractionText();
 	FText GetInteractionText_Implementation();
 
-	UFUNCTION(BlueprintNativeEvent)
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void Interact(class ATFCharacter* Caller);
 	void Interact_Implementation(class ATFCharacter* Caller); 
-	UFUNCTION(BlueprintNativeEvent)
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool IsInteracable() const;
 	bool IsInteracable_Implementation() const;
 };

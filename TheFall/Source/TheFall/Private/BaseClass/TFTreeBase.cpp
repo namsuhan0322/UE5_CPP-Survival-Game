@@ -2,6 +2,7 @@
 
 
 #include "BaseClass/TFTreeBase.h"
+#include "BaseClass/TFPickupActorBase.h"
 #include "Engine/DamageEvents.h"
 
 ATFTreeBase::ATFTreeBase()
@@ -26,6 +27,7 @@ void ATFTreeBase::SetHarvestState()
 	TreeStumpMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	TreeStumpMesh->bHiddenInGame = false;
 	TreeStumpMesh->SetVisibility(true, true);
+	SpawnPickups();
 	MarkComponentsRenderStateDirty();
 }
 
@@ -34,6 +36,24 @@ void ATFTreeBase::Harvest()
 	bIsHarvested = true;
 	SetHarvestState();
 	OnHarvestedBP();
+}
+
+void ATFTreeBase::SpawnPickups()
+{
+	if (!IsValid(LogPickupActor)) return;
+
+	for (int i = 0; i < NumberOfLogsToSpawn; i++)
+	{
+		FVector TreeLoc = this->GetActorLocation();
+		FTransform SpawnTrans = SpawnActorTransforms[i];
+		SpawnTrans.SetLocation(SpawnTrans.GetLocation() + TreeLoc);
+		ATFPickupActorBase* Log = GetWorld()->SpawnActor<ATFPickupActorBase>(LogPickupActor, SpawnTrans);
+		if (IsValid(Log))
+		{
+			Log->SetActorTransform(SpawnTrans);
+			OnHarvestedBP();
+		}
+	}
 }
 
 void ATFTreeBase::OnHarvestedBP_Implementation()
