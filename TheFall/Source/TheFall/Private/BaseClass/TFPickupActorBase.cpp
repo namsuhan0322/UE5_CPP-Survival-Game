@@ -16,7 +16,14 @@ FText ATFPickupActorBase::GetInteractionText_Implementation()
 
 void ATFPickupActorBase::Interact_Implementation(class ATFCharacter* Caller)
 {
-
+	/*UInventoryComponent* InventComp = Caller->GetInventory();
+	int rem = -1;
+	if (rem = InventComp->AddItem(InventoryItem, ItemCount) == 0)
+	{
+		return;
+	}
+	ItemCount = rem;
+	return;*/
 }
 
 bool ATFPickupActorBase::IsInteracable_Implementation() const
